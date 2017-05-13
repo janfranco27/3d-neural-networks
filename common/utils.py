@@ -117,3 +117,65 @@ def get_one_dimension_descriptor(function_name, descriptor_rows,
     new_val_x = _get_one_dimension_descriptor_for_data(function_name, val_x)
 
     return new_train_x, new_val_x
+
+
+def train_with_generator(descriptor_dir, method, descriptor_rows,
+                         descriptor_cols=1, training_set_size=800,
+                         batch_size=32):
+
+    import inspect
+    print 'caller: ', inspect.stack()[1][3]
+    models_dir = os.path.join(DATA_DIR, descriptor_dir)
+    train = pd.read_csv(
+        os.path.join(models_dir, '{0}-train.csv'.format(method)))
+    train.head()
+
+    y_data = to_categorical(train.label.values)
+    if descriptor_cols is not 1:
+        batch_features = np.zeros((
+            batch_size, descriptor_rows, descriptor_cols, 1))
+    else:
+        batch_features = np.zeros(
+            (batch_size, descriptor_rows))
+    batch_labels = np.zeros((batch_size, len(y_data[0])))
+
+    idx = 0
+    while 1:
+        for _ in range(batch_size):
+            i = idx % training_set_size
+            descriptor_path = os.path.join(models_dir, method, train.filename.values[i])
+            print '\n', descriptor_path
+            d = np.loadtxt(descriptor_path)
+            if descriptor_cols is not 1:
+                batch_features[_] = d.reshape(
+                    (descriptor_rows, descriptor_cols, 1))
+            else:
+                batch_features[_] = d.reshape(
+                    (descriptor_rows))
+            batch_labels[_] = y_data[i]
+            idx += 1
+        yield (batch_features, batch_labels)
+
+
+def evaluate_with_generator(descriptor_dir, method, descriptor_rows,
+                       descriptor_cols=1):
+
+    models_dir = os.path.join(DATA_DIR, descriptor_dir)
+    train = pd.read_csv(
+        os.path.join(models_dir, '{0}-test.csv'.format(method)))
+    train.head()
+
+    y_data = to_categorical(train.label.values)
+    while 1:
+        for idx, descriptor_name in enumerate(train.filename):
+            descriptor_path = os.path.join(models_dir, method, descriptor_name)
+            x_data = np.loadtxt(descriptor_path)
+
+            if descriptor_cols is not 1:
+                x_data = x_data.reshape(
+                    (1, descriptor_rows, descriptor_cols, 1))
+            else:
+                x_data = x_data.reshape(
+                    (1, descriptor_rows))
+
+            yield (x_data, y_data[idx].reshape(1, len(y_data[0])))

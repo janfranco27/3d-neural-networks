@@ -67,6 +67,19 @@ class MLP:
         print('\n%s: %.2f%%' % (self.model.metrics_names[1], scores[1] * 100))
         return scores
 
+    def train_generator(self, dir, method, rows, cols, training_size,
+                        validation_size, epochs, batch_size=32):
+
+        from common.utils import train_with_generator, evaluate_with_generator
+        print(training_size/batch_size)
+        self.history = self.model.fit_generator(
+            train_with_generator(dir, method, rows, cols, training_size, batch_size),
+            samples_per_epoch=training_size,
+            nb_epoch=epochs,
+            validation_data=evaluate_with_generator(dir, method, rows, cols),
+            nb_val_samples=validation_size
+        )
+
     def plot(self, plot_dir, filename):
         # summarize history for loss
         plt.figure()

@@ -31,17 +31,17 @@ Epoch 30/30
 '''
 
 method = 'hks'
-x_data, y_data = read_data(
-    descriptor_dir='shrec-15-kp',
-    method=method,
-    descriptor_rows=KP_DESCRIPTOR_ROWS,
-    descriptor_cols=DESCRIPTOR_COLS)
-
-(train_x, val_x, train_y, val_y) = get_training_and_test_data_no_random(
-    x_data,
-    y_data,
-    split=SPLIT_SIZE
-)
+#x_data, y_data = read_data(
+#    descriptor_dir='shrec-15-kp',
+#    method=method,
+#    descriptor_rows=KP_DESCRIPTOR_ROWS,
+#    descriptor_cols=DESCRIPTOR_COLS)
+#
+#(train_x, val_x, train_y, val_y) = get_training_and_test_data_no_random(
+#    x_data,
+#    y_data,
+#    split=SPLIT_SIZE
+#)
 
 #(train_x, train_y) = shuffle_data(train_x, train_y)
 
@@ -50,16 +50,16 @@ x_data, y_data = read_data(
 #(train_x, val_x) = get_one_dimension_descriptor(
 #    'norm', KP_DESCRIPTOR_ROWS, DESCRIPTOR_COLS, train_x, val_x)
 
-train_x = train_x.reshape(-1, 10000)
-val_x = val_x.reshape(-1, 10000)
+#train_x = train_x.reshape(-1, 10000)
+#val_x = val_x.reshape(-1, 10000)
 
 
 mlp_model = MLP(
     input_units=KP_DESCRIPTOR_ROWS * 100,
     output_units=OUTPUT_UNITS,
-    hidden_layers=(15000, 8000),
+    hidden_layers=(10000, 4000),
     activations=('relu', 'relu', 'softmax'))
 
-scores = mlp_model.train(
-    train_x, train_y, val_x, val_y, epochs=40, batch_size=50)
-print scores
+scores = mlp_model.train_generator(
+    dir='shrec-15-kp', method='hks', rows= KP_DESCRIPTOR_ROWS * 100, cols=1,
+    training_size=10, validation_size=2,epochs=2, batch_size=2)
