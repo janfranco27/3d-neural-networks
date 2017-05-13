@@ -1,0 +1,7 @@
+.vscode/*
+data/*
+results/*
+.idea
+venv
+*.tar.gz
+*.pyc
