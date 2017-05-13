@@ -35,20 +35,21 @@ class CNN:
             loss=loss_function, optimizer=optimizer_method,
             metrics=['accuracy', 'precision', 'recall'])
 
-    def train_generator(self, dir, method, rows, cols, training_size,
-                        validation_size, epochs, batch_size=32):
+    def train_generator(self, dir, rows, cols, training_size,
+                        validation_size, epochs, batch_size=32, channels=1,
+                        method='hks'):
 
         from common.utils import train_with_generator, evaluate_with_generator
 
-        print(training_size / batch_size)
         self.history = self.model.fit_generator(
-            train_with_generator(dir, method, rows, cols, training_size, batch_size),
+            train_with_generator(dir, rows, cols, training_size, batch_size,
+                                 channels=channels, method=method),
             samples_per_epoch=training_size,
             nb_epoch=epochs,
-            validation_data=evaluate_with_generator(dir, method, rows, cols),
+            validation_data=evaluate_with_generator(dir, rows, cols, channels=channels,
+                                                    method=method),
             nb_val_samples=validation_size
         )
-
 
     def train(self, train_x, train_y, validation_x, validation_y,
               epochs=5, batch_size=32):

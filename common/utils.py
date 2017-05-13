@@ -119,21 +119,19 @@ def get_one_dimension_descriptor(function_name, descriptor_rows,
     return new_train_x, new_val_x
 
 
-def train_with_generator(descriptor_dir, method, descriptor_rows,
+def train_with_generator(descriptor_dir, descriptor_rows,
                          descriptor_cols=1, training_set_size=800,
-                         batch_size=32):
+                         batch_size=32, channels=1, method='hks'):
 
-    import inspect
-    print 'caller: ', inspect.stack()[1][3]
     models_dir = os.path.join(DATA_DIR, descriptor_dir)
     train = pd.read_csv(
         os.path.join(models_dir, '{0}-train.csv'.format(method)))
     train.head()
 
     y_data = to_categorical(train.label.values)
-    if descriptor_cols is not 1:
+    if not descriptor_cols == 1:
         batch_features = np.zeros((
-            batch_size, descriptor_rows, descriptor_cols, 1))
+            batch_size, descriptor_rows, descriptor_cols, channels))
     else:
         batch_features = np.zeros(
             (batch_size, descriptor_rows))
@@ -143,22 +141,64 @@ def train_with_generator(descriptor_dir, method, descriptor_rows,
     while 1:
         for _ in range(batch_size):
             i = idx % training_set_size
-            descriptor_path = os.path.join(models_dir, method, train.filename.values[i])
-            print '\n', descriptor_path
-            d = np.loadtxt(descriptor_path)
-            if descriptor_cols is not 1:
-                batch_features[_] = d.reshape(
-                    (descriptor_rows, descriptor_cols, 1))
+            if channels == 1:
+                batch_features[_] = read_one_channel(models_dir,
+                                                     method,
+                                                     train.filename.values[i],
+                                                     descriptor_rows,
+                                                     descriptor_cols)
             else:
-                batch_features[_] = d.reshape(
-                    (descriptor_rows))
+                batch_features[_] = read_two_channels(models_dir,
+                                                     train.filename.values[i],
+                                                     descriptor_rows,
+                                                     descriptor_cols)
             batch_labels[_] = y_data[i]
             idx += 1
         yield (batch_features, batch_labels)
 
 
-def evaluate_with_generator(descriptor_dir, method, descriptor_rows,
-                       descriptor_cols=1):
+def read_one_channel(models_dir, method, filename, rows, cols=1, is_training=False):
+    descriptor_path = os.path.join(models_dir, method, filename)
+    d = np.loadtxt(descriptor_path)
+
+    if cols is not 1:
+        d = d.reshape((rows, cols, 1))
+    else:
+        d = d.reshape((rows))
+
+    if is_training:
+        if not cols == 1:
+            d = d.reshape(1, rows, cols, 1)
+        else:
+            d = d.reshape(1, rows)
+    return d
+
+
+def read_two_channels(models_dir, filename, rows, cols, is_training=False):
+    methods = ('hks', 'wks')
+    filename = filename[4:]
+    temp = []
+    for method in methods:
+        descriptor_path = os.path.join(models_dir,
+                                       method,
+                                       '{0}-{1}'.format(method, filename))
+        data = np.loadtxt(descriptor_path)
+        temp.append(data)
+
+    x_data = np.column_stack(temp)
+    x_data = x_data.reshape(rows, cols, len(methods))
+
+    if is_training:
+        if not cols == 1:
+            x_data = x_data.reshape(1, rows, cols, len(methods))
+        else:
+            x_data = x_data.reshape(1, rows, len(methods))
+
+    return x_data
+
+
+def evaluate_with_generator(descriptor_dir, descriptor_rows, descriptor_cols=1,
+                            channels=1, method='hks'):
 
     models_dir = os.path.join(DATA_DIR, descriptor_dir)
     train = pd.read_csv(
@@ -168,14 +208,17 @@ def evaluate_with_generator(descriptor_dir, method, descriptor_rows,
     y_data = to_categorical(train.label.values)
     while 1:
         for idx, descriptor_name in enumerate(train.filename):
-            descriptor_path = os.path.join(models_dir, method, descriptor_name)
-            x_data = np.loadtxt(descriptor_path)
 
-            if descriptor_cols is not 1:
-                x_data = x_data.reshape(
-                    (1, descriptor_rows, descriptor_cols, 1))
+            if channels == 1:
+                x_data = read_one_channel(models_dir,
+                                          method,
+                                          descriptor_name,
+                                          descriptor_rows,
+                                          descriptor_cols, is_training=True)
             else:
-                x_data = x_data.reshape(
-                    (1, descriptor_rows))
+                x_data = read_two_channels(models_dir,
+                                           descriptor_name,
+                                           descriptor_rows,
+                                           descriptor_cols, is_training=True)
 
             yield (x_data, y_data[idx].reshape(1, len(y_data[0])))

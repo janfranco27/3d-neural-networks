@@ -57,9 +57,9 @@ method = 'hks'
 mlp_model = MLP(
     input_units=KP_DESCRIPTOR_ROWS * 100,
     output_units=OUTPUT_UNITS,
-    hidden_layers=(10000, 4000),
+    hidden_layers=(100, 40),
     activations=('relu', 'relu', 'softmax'))
 
 scores = mlp_model.train_generator(
-    dir='shrec-15-kp', method='hks', rows= KP_DESCRIPTOR_ROWS * 100, cols=1,
+    dir='shrec-15-kp', channels=1, method='hks', rows= KP_DESCRIPTOR_ROWS * 100, cols=1,
     training_size=10, validation_size=2,epochs=2, batch_size=2)

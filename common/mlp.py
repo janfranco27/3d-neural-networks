@@ -2,6 +2,7 @@ import os
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.models import model_from_json
+from keras.optimizers import SGD
 import matplotlib.pyplot as plt
 
 
@@ -43,6 +44,7 @@ class MLP:
 
         else:
             self.model = self.read_model(from_file)
+        sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 
         self.compile_model()
 
@@ -67,16 +69,16 @@ class MLP:
         print('\n%s: %.2f%%' % (self.model.metrics_names[1], scores[1] * 100))
         return scores
 
-    def train_generator(self, dir, method, rows, cols, training_size,
-                        validation_size, epochs, batch_size=32):
+    def train_generator(self, dir, rows, cols, training_size,
+                        validation_size, epochs, batch_size=32, channels=1,
+                        method='hks'):
 
         from common.utils import train_with_generator, evaluate_with_generator
-        print(training_size/batch_size)
         self.history = self.model.fit_generator(
-            train_with_generator(dir, method, rows, cols, training_size, batch_size),
+            train_with_generator(dir, rows, cols, training_size, batch_size, channels=channels, method=method),
             samples_per_epoch=training_size,
             nb_epoch=epochs,
-            validation_data=evaluate_with_generator(dir, method, rows, cols),
+            validation_data=evaluate_with_generator(dir, rows, cols, channels=channels, method=method),
             nb_val_samples=validation_size
         )
 

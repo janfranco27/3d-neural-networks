@@ -33,7 +33,7 @@ method = 'hks'
 cnn_model = CNN(
     descriptor_rows=KP_DESCRIPTOR_ROWS,
     descriptor_cols=DESCRIPTOR_COLS,
-    channels=1)
+    channels=2)
 
 nb_filters = 8
 nb_pool = 2
@@ -58,5 +58,5 @@ cnn_model.add_layer(Activation('softmax'))
 cnn_model.compile_model()
 
 scores = cnn_model.train_generator(
-    dir='shrec-15-kp', channels=1, method='hks', rows=100, cols=100,
+    dir='shrec-15-kp', channels=2, rows=100, cols=100,
     training_size=10, validation_size=2,epochs=2, batch_size=2)
