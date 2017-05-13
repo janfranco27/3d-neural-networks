@@ -12,4 +12,4 @@ BASE_DIR = os.path.abspath(os.path.dirname(__name__))
 
 PLOT_DIR = os.path.join(BASE_DIR, '..', 'results', 'shrec15')
 
-SPLIT_SIZE = 800
+SPLIT_SIZE = 950
