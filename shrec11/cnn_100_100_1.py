@@ -8,7 +8,7 @@ from keras.layers import (
 from common.utils import read_data, split_data
 from common.cnn import CNN
 
-from constants import (
+from shrec11.constants import (
     KP_DESCRIPTOR_ROWS, KP_DESCRIPTOR_COLS, OUTPUT_UNITS)
 
 
@@ -16,7 +16,7 @@ from constants import (
 method = 'hks'
 
 x_data, y_data = read_data(
-    descriptor_dir='kp-sorted-dataset',
+    descriptor_dir='shrec11-kp',
     method=method,
     descriptor_rows=KP_DESCRIPTOR_ROWS,
     descriptor_cols=KP_DESCRIPTOR_COLS)
@@ -59,7 +59,7 @@ cnn_model.model.add(Activation('relu'))
 cnn_model.model.add(Dropout(0.5))
 # cnn_model.model.add(Dense(600))
 # cnn_model.model.add(Activation('relu'))
-cnn_model.model.add(Dense(50))
+cnn_model.model.add(Dense(3))
 cnn_model.model.add(Activation('softmax'))
 
 cnn_model.compile_model()

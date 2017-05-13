@@ -8,7 +8,7 @@ from utils import read_data, get_training_and_test_data, read_binary_data
 from constants import ROOT_DIR
 
 method = 'hks'
-path = os.path.join(ROOT_DIR, '2000-sorted-dataset')
+path = os.path.join(ROOT_DIR, 'data', '2000-sorted-dataset')
 
 
 descriptor_width = 2000
@@ -28,6 +28,7 @@ def generate_arrays_from_file(method, path, descriptor_width, descriptor_height,
         for _ in range(batch_size):
             i = idx % 80
             descriptor_path = os.path.join(path, method, train.filename.values[i])
+            print '\n', descriptor_path
             d = np.loadtxt(descriptor_path)
             batch_features[_] = d.reshape((descriptor_width, descriptor_height, 1))
             batch_labels[_] = y_data[i]
@@ -50,7 +51,6 @@ def evaluate_arrays_from_file(method, path, descriptor_width, descriptor_height)
             yield (x_data, y_data[idx].reshape(1, 3))
 
 
-'''
 cnn_model = CNN(descriptor_width=descriptor_width, descriptor_height=descriptor_height)
 scores = cnn_model.train_generator(method, path, generate_arrays_from_file, evaluate_arrays_from_file, epochs=10)
 print scores
@@ -64,3 +64,4 @@ val_x = val_x.reshape(-1, descriptor_width, descriptor_height, 1)
 #cnn_model = CNN(descriptor_width=descriptor_width, descriptor_height=descriptor_height)
 #scores = cnn_model.train(train_x, train_y, val_x, val_y, epochs=10, batch_size=32)
 #print scores
+'''

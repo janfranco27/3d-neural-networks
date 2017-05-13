@@ -66,7 +66,7 @@ Epoch 30/30
 
 method = 'hks'
 x_data, y_data = read_data(
-    descriptor_dir='kp-sorted-dataset',
+    descriptor_dir='shrec11-kp',
     method=method,
     descriptor_rows=KP_DESCRIPTOR_ROWS,
     descriptor_cols=KP_DESCRIPTOR_COLS)

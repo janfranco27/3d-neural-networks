@@ -5,3 +5,5 @@ venv
 *.tar.gz
 *.pyc
 *.txt
+.*
+!/.gitignore

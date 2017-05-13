@@ -17,17 +17,17 @@ def read_data(descriptor_dir, method, descriptor_rows, descriptor_cols):
     descriptor_size = descriptor_rows * descriptor_cols
     models_dir = os.path.join(DATA_DIR, descriptor_dir)
     train = pd.read_csv(
-        os.path.join(models_dir, '{0}-train.csv'.format(method)))
+        os.path.join(models_dir, 'models.csv'.format(method)))
     train.head()
 
     temp = []
     for descriptor_name in train.filename:
-        descriptor_path = os.path.join(models_dir, method, descriptor_name)
+        descriptor_path = os.path.join(models_dir, method, '{0}-{1}'.format(method, descriptor_name))
         data = np.loadtxt(descriptor_path)
         temp.append(data)
 
     x_data = np.stack(temp)
-    x_data = x_data.reshape(-1, descriptor_size).astype('float32')
+    x_data = x_data.reshape(-1, descriptor_size)
     y_data = to_categorical(train.label.values)
     return (x_data, y_data)
 
@@ -44,14 +44,14 @@ def read_multiple_channels_data(descriptor_dir, descriptor_rows,
     y_data = []
     for method in methods:
         train = pd.read_csv(
-            os.path.join(models_dir, '{0}-train.csv'.format(method)))
+            os.path.join(models_dir, 'models.csv'.format(method)))
         train.head()
 
         y_data = to_categorical(train.label.values)
 
         temp = []
         for descriptor_name in train.filename:
-            descriptor_path = os.path.join(models_dir, method, descriptor_name)
+            descriptor_path = os.path.join(models_dir, method, '{0}-{1}'.format(method, descriptor_name))
             data = np.loadtxt(descriptor_path)
             temp.append(data)
         data_loaded.append(temp)

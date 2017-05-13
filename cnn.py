@@ -92,7 +92,7 @@ class CNN:
         self.model.add(Dropout(0.5))
         #self.model.add(Dense(600))
         #self.model.add(Activation('relu'))
-        self.model.add(Dense(50))
+        self.model.add(Dense(3))
         self.model.add(Activation('softmax'))
 
         self.compile_model()
