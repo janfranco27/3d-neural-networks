@@ -35,6 +35,21 @@ class CNN:
             loss=loss_function, optimizer=optimizer_method,
             metrics=['accuracy', 'precision', 'recall'])
 
+    def train_generator(self, dir, method, rows, cols, training_size,
+                        validation_size, epochs, batch_size=32):
+
+        from common.utils import train_with_generator, evaluate_with_generator
+
+        print(training_size / batch_size)
+        self.history = self.model.fit_generator(
+            train_with_generator(dir, method, rows, cols, training_size, batch_size),
+            samples_per_epoch=training_size,
+            nb_epoch=epochs,
+            validation_data=evaluate_with_generator(dir, method, rows, cols),
+            nb_val_samples=validation_size
+        )
+
+
     def train(self, train_x, train_y, validation_x, validation_y,
               epochs=5, batch_size=32):
         self.trained_model = self.model.fit(
@@ -54,26 +69,6 @@ class CNN:
         #    m = ([1 if x == value else 0 for x in e])
         #    print m
         return scores
-
-
-    def train_generator(self, method, path, train_generator, eval_generator, samples_per_epoch=80, epochs=50):
-        self.trained_model = self.model.fit_generator(
-            train_generator(method, path, self.descriptor_rows, self.descriptor_cols, 4),
-            samples_per_epoch=12,
-            nb_epoch=epochs,
-            validation_data=eval_generator(method, path, self.descriptor_rows,
-                                           self.descriptor_cols),
-            nb_val_samples=54
-        )
-
-        scores = self.model.evaluate_generator(
-            eval_generator(method, path, self.descriptor_rows, self.descriptor_cols),
-            val_samples=54)
-
-        print('\n%s: %.2f%%' % (self.model.metrics_names[1], scores[1] * 100))
-        return scores
-
-
 
 '''
     def train_generator(self, method, path, train_generator, eval_generator, steps_per_epoch=80, epochs=50):
