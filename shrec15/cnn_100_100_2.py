@@ -58,5 +58,5 @@ cnn_model.add_layer(Activation('softmax'))
 cnn_model.compile_model()
 
 scores = cnn_model.train_generator(
-    dir='shrec-15-kp', channels=2, rows=100, cols=100,
+    dir='shrec15-kp', channels=2, rows=100, cols=100,
     training_size=10, validation_size=2,epochs=2, batch_size=2)

@@ -5,6 +5,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from keras.layers import (
     Dense, Convolution2D, MaxPooling2D, Flatten, Activation, Dropout)
 
+from keras import regularizers
+
 from common.utils import read_data, get_training_and_test_data_no_random
 from common.cnn import CNN
 
@@ -15,20 +17,20 @@ from shrec15.constants import (
 
 method = 'hks'
 
-#x_data, y_data = read_data(
-#    descriptor_dir='shrec-15-kp',
-#    method=method,
-#    descriptor_rows=KP_DESCRIPTOR_ROWS,
-#    descriptor_cols=DESCRIPTOR_COLS)
-#
-#(train_x, val_x, train_y, val_y) = get_training_and_test_data_no_random(
-#    x_data,
-#    y_data,
-#    split=SPLIT_SIZE
-#)
-#
-#train_x = train_x.reshape((-1, KP_DESCRIPTOR_ROWS, DESCRIPTOR_COLS, 1))
-#val_x = val_x.reshape((-1, KP_DESCRIPTOR_ROWS, DESCRIPTOR_COLS, 1))
+x_data, y_data = read_data(
+    descriptor_dir='shrec15-kp',
+    method=method,
+    descriptor_rows=KP_DESCRIPTOR_ROWS,
+    descriptor_cols=DESCRIPTOR_COLS)
+
+(train_x, val_x, train_y, val_y) = get_training_and_test_data_no_random(
+    x_data,
+    y_data,
+    split=SPLIT_SIZE
+)
+
+train_x = train_x.reshape((-1, KP_DESCRIPTOR_ROWS, DESCRIPTOR_COLS, 1))
+val_x = val_x.reshape((-1, KP_DESCRIPTOR_ROWS, DESCRIPTOR_COLS, 1))
 
 cnn_model = CNN(
     descriptor_rows=KP_DESCRIPTOR_ROWS,
@@ -43,7 +45,7 @@ cnn_model.add_layer(Convolution2D(
     nb_filters*4, nb_conv, nb_conv, input_shape=cnn_model.input_shape))
 cnn_model.add_layer(Activation('relu'))
 cnn_model.add_layer(MaxPooling2D((nb_pool, nb_pool)))
-cnn_model.add_layer(Convolution2D(nb_filters*4, nb_conv, nb_conv))
+cnn_model.add_layer(Convolution2D(nb_filters*4, nb_conv, nb_conv, W_regularizer=regularizers.l2(0.01)))
 cnn_model.add_layer(Activation('relu'))
 cnn_model.add_layer(MaxPooling2D((nb_pool, nb_pool)))
 cnn_model.add_layer(Flatten())
@@ -57,6 +59,11 @@ cnn_model.add_layer(Activation('softmax'))
 
 cnn_model.compile_model()
 
-scores = cnn_model.train_generator(
-    dir='shrec-15-kp', channels=1, method='hks', rows=100, cols=100,
-    training_size=10, validation_size=2,epochs=2, batch_size=2)
+scores = cnn_model.train(train_x, train_y, val_x, val_y, epochs=2, batch_size=16)
+print scores
+
+
+
+#scores = cnn_model.train_generator(
+#    dir='shrec15-kp', channels=1, method='hks', rows=100, cols=100,
+#    training_size=10, validation_size=2,epochs=2, batch_size=2)
