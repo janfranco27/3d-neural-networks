@@ -2,6 +2,8 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+import numpy as np
+
 from keras.layers import (
     Dense, Convolution2D, MaxPooling2D, Flatten, Activation, Dropout)
 
@@ -26,7 +28,7 @@ x_data, y_data = read_data(
 (train_x, val_x, train_y, val_y) = get_training_and_test_data_no_random(
     x_data,
     y_data,
-    split=SPLIT_SIZE
+    split=20
 )
 
 train_x = train_x.reshape((-1, KP_DESCRIPTOR_ROWS, DESCRIPTOR_COLS, 1))
@@ -59,10 +61,15 @@ cnn_model.add_layer(Activation('softmax'))
 
 cnn_model.compile_model()
 
-scores = cnn_model.train(train_x, train_y, val_x, val_y, epochs=2, batch_size=16)
+scores = cnn_model.train(train_x, train_y, val_x, val_y, epochs=1, batch_size=50)
 print scores
 
 
+results = cnn_model.predict(val_x)
+
+for r in results:
+    r = np.sort(r)
+    print r
 
 #scores = cnn_model.train_generator(
 #    dir='shrec15-kp', channels=1, method='hks', rows=100, cols=100,

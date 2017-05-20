@@ -71,6 +71,8 @@ class CNN:
         #    print m
         return scores
 
+    def predict(self, x_data):
+        return self.model.predict(x_data)
 '''
     def train_generator(self, method, path, train_generator, eval_generator, steps_per_epoch=80, epochs=50):
         self.trained_model = self.model.fit_generator(

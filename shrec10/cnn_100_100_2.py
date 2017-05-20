@@ -8,7 +8,7 @@ from keras.layers import (
 from common.utils import split_data, read_multiple_channels_data
 from common.cnn import CNN
 
-from shrec11.constants import (
+from shrec10.constants import (
     KP_DESCRIPTOR_ROWS, KP_DESCRIPTOR_COLS, OUTPUT_UNITS)
 
 
@@ -16,7 +16,7 @@ from shrec11.constants import (
 method = 'hks'
 
 x_data, y_data = read_multiple_channels_data(
-    descriptor_dir='shrec11-kp',
+    descriptor_dir='shrec10-kp',
     descriptor_rows=KP_DESCRIPTOR_ROWS,
     descriptor_cols=KP_DESCRIPTOR_COLS)
 

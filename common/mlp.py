@@ -23,6 +23,9 @@ class MLP:
         hidden_units (list or tuple): List indicating the number of neurons in
             ith hidden layer
         '''
+        if not hidden_layers or activations:
+            self.model = Sequential()
+            return
         if not from_file:
             self.model = Sequential()
 
@@ -48,23 +51,26 @@ class MLP:
 
         self.compile_model()
 
+    def add_layer(self, layer):
+        self.model.add(layer)
+
     def compile_model(self, loss_function='categorical_crossentropy',
                       optimizer_method='adam'):
         self.loss_function = loss_function
         self.optimizer_method = optimizer_method
         self.model.compile(
-            loss=loss_function, optimizer=optimizer_method,
+            loss=self.loss_function, optimizer=self.optimizer_method,
             metrics=['accuracy'])
 
     def train(self, train_x, train_y, validation_x, validation_y,
-              file=None, epochs=5, batch_size=32):
+              file=None, epochs=5, batch_size=32, shuffle=True):
         #callback = ModelCheckpoint(
         #    file, monitor='val_loss', verbose=0, save_best_only=True,
         #    save_weights_only=False, mode='auto', period=1)
 
         self.history = self.model.fit(
             train_x, train_y, nb_epoch=epochs, batch_size=batch_size,
-            validation_data=(validation_x, validation_y))
+            validation_data=(validation_x, validation_y), shuffle=shuffle)
         scores = self.model.evaluate(validation_x, validation_y)
         print('\n%s: %.2f%%' % (self.model.metrics_names[1], scores[1] * 100))
         return scores

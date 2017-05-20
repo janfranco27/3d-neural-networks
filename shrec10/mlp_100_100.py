@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from common.utils import read_data, split_data
 from common.mlp import MLP
 
-from shrec11.constants import (
+from shrec10.constants import (
     KP_DESCRIPTOR_ROWS, KP_DESCRIPTOR_COLS, KP_UNITS, OUTPUT_UNITS, PLOT_DIR)
 
 '''
@@ -34,7 +34,7 @@ Epoch 8/20
 
 method = 'hks'
 x_data, y_data = read_data(
-    descriptor_dir='shrec11-kp',
+    descriptor_dir='shrec10-kp',
     method=method,
     descriptor_rows=KP_DESCRIPTOR_ROWS,
     descriptor_cols=KP_DESCRIPTOR_COLS)
