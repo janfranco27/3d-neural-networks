@@ -48,3 +48,37 @@ def read_data(descriptor_dir, number_of_models, method, descriptor_rows, descrip
     x_data = x_data.reshape(-1, descriptor_size)
     return (x_data, y_data)
 
+
+def read_multiple_channels_data(descriptor_dir, descriptor_rows,descriptor_cols, methods=('hks', 'wks'), is_training=True):
+    '''
+    The files hks-train and wks-train must have the models in the same order
+    because the train labels are override
+    '''
+    models_dir = os.path.join(DATA_DIR, descriptor_dir)
+
+    data_loaded = []
+    y_data = []
+    for method in methods:
+        if is_training:
+            train = pd.read_csv(
+                os.path.join(models_dir, 'train-1.csv'))
+        else:
+            train = pd.read_csv(
+                os.path.join(models_dir, 'test-1.csv'))
+        train.head()
+
+        y_data = to_categorical(train.label.values)
+
+        temp = []
+        for descriptor_name in train.filename:
+            descriptor_path = os.path.join(models_dir, method,
+                                           '{0}-{1}'.format(method,
+                                                            descriptor_name))
+            data = np.loadtxt(descriptor_path)
+            temp.append(data)
+        data_loaded.append(temp)
+
+    x_data = np.column_stack(data_loaded)
+    x_data = x_data.reshape(
+        -1, descriptor_rows, descriptor_cols, 2).astype('float32')
+    return (x_data, y_data)

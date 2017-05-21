@@ -40,7 +40,6 @@ class CNN:
                         method='hks'):
 
         from common.utils import train_with_generator, evaluate_with_generator
-
         self.history = self.model.fit_generator(
             train_with_generator(dir, rows, cols, training_size, batch_size,
                                  channels=channels, method=method),

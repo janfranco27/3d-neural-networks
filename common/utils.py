@@ -124,8 +124,10 @@ def train_with_generator(descriptor_dir, descriptor_rows,
                          batch_size=32, channels=1, method='hks'):
 
     models_dir = os.path.join(DATA_DIR, descriptor_dir)
+    #train = pd.read_csv(
+    #    os.path.join(models_dir, '{0}-train.csv'.format(method)))
     train = pd.read_csv(
-        os.path.join(models_dir, '{0}-train.csv'.format(method)))
+        os.path.join(models_dir, 'train-1.csv'.format(method)))
     train.head()
 
     y_data = to_categorical(train.label.values)
@@ -148,10 +150,11 @@ def train_with_generator(descriptor_dir, descriptor_rows,
                                                      descriptor_rows,
                                                      descriptor_cols)
             else:
-                batch_features[_] = read_two_channels(models_dir,
-                                                     train.filename.values[i],
-                                                     descriptor_rows,
-                                                     descriptor_cols)
+                batch_features[_] = read_more_channels(models_dir,
+                                                       train.filename.values[i],
+                                                       descriptor_rows,
+                                                       descriptor_cols,
+                                                       methods=method)
             batch_labels[_] = y_data[i]
             idx += 1
         yield (batch_features, batch_labels)
@@ -174,9 +177,7 @@ def read_one_channel(models_dir, method, filename, rows, cols=1, is_training=Fal
     return d
 
 
-def read_two_channels(models_dir, filename, rows, cols, is_training=False):
-    methods = ('hks', 'wks')
-    filename = filename[4:]
+def read_more_channels(models_dir, filename, rows, cols, is_training=False, methods=('hks', 'wks')):
     temp = []
     for method in methods:
         descriptor_path = os.path.join(models_dir,
@@ -202,7 +203,7 @@ def evaluate_with_generator(descriptor_dir, descriptor_rows, descriptor_cols=1,
 
     models_dir = os.path.join(DATA_DIR, descriptor_dir)
     train = pd.read_csv(
-        os.path.join(models_dir, '{0}-test.csv'.format(method)))
+        os.path.join(models_dir, 'test-1.csv'.format(method)))
     train.head()
 
     y_data = to_categorical(train.label.values)
@@ -216,9 +217,10 @@ def evaluate_with_generator(descriptor_dir, descriptor_rows, descriptor_cols=1,
                                           descriptor_rows,
                                           descriptor_cols, is_training=True)
             else:
-                x_data = read_two_channels(models_dir,
-                                           descriptor_name,
-                                           descriptor_rows,
-                                           descriptor_cols, is_training=True)
+                x_data = read_more_channels(models_dir,
+                                            descriptor_name,
+                                            descriptor_rows,
+                                            descriptor_cols, is_training=True,
+                                            methods=method)
 
             yield (x_data, y_data[idx].reshape(1, len(y_data[0])))

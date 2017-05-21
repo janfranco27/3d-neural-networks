@@ -17,7 +17,7 @@ method = 'hks'
 
 train_x, train_y = read_data(
     descriptor_dir='shrec11-kp',
-    number_of_models=16,
+    number_of_models=1,
     method=method,
     descriptor_rows=KP_DESCRIPTOR_ROWS,
     descriptor_cols=KP_DESCRIPTOR_COLS)
@@ -26,7 +26,7 @@ train_x, train_y = shuffle_data(train_x, train_y)
 
 test_x, test_y = read_data(
     descriptor_dir='shrec11-kp',
-    number_of_models=4,
+    number_of_models=1,
     method=method,
     descriptor_rows=KP_DESCRIPTOR_ROWS,
     descriptor_cols=KP_DESCRIPTOR_COLS,
@@ -52,21 +52,14 @@ cnn_model.model.add(Activation('relu'))
 cnn_model.model.add(MaxPooling2D((2, 2)))
 cnn_model.model.add(Convolution2D(64, 3, 3))
 cnn_model.model.add(Activation('relu'))
-cnn_model.model.add(Convolution2D(64, 3, 3))
-cnn_model.model.add(Activation('relu'))
-cnn_model.model.add(Dropout(0.25))
-cnn_model.model.add(MaxPooling2D((2, 2)))
-cnn_model.model.add(Convolution2D(128, 3, 3))
-cnn_model.model.add(Activation('relu'))
 cnn_model.model.add(MaxPooling2D((2, 2)))
 cnn_model.model.add(Flatten())
 cnn_model.model.add(Dense(300))
 cnn_model.model.add(Activation('relu'))
-cnn_model.model.add(Dropout(0.5))
 cnn_model.model.add(Dense(OUTPUT_UNITS))
 cnn_model.model.add(Activation('softmax'))
 
 cnn_model.compile_model()
 
-scores = cnn_model.train(train_x, train_y, test_x, test_y, epochs=20, batch_size=16)
+scores = cnn_model.train(train_x, train_y, test_x, test_y, epochs=2, batch_size=15)
 print scores
