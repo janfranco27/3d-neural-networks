@@ -6,6 +6,26 @@ from keras.utils.np_utils import to_categorical
 from constants import DATA_DIR
 
 
+def get_m_n_descriptors(m, n, descriptor_dir, number_of_models=10, method='hks', is_training=True):
+    models_dir = os.path.join(DATA_DIR, descriptor_dir)
+    save_dir = os.path.join(models_dir, '{0}-{1}'.format(method, m))
+    if is_training:
+        data = pd.read_csv(os.path.join(models_dir, 'train-{0}.csv'.format(number_of_models)))
+    else:
+        data = pd.read_csv(os.path.join(models_dir, 'test-{0}.csv'.format(number_of_models)))
+
+    data.head()
+
+    temp = []
+    for descriptor_name in data.filename:
+        descriptor_path = os.path.join(models_dir, method,
+                                       '{0}-{1}'.format(method, descriptor_name))
+        data = np.loadtxt(descriptor_path)
+        data = data.reshape((300, 200))
+        np.savetxt(os.path.join(save_dir, '{0}-{1}'.format(method, descriptor_name)), data[:m, :n], delimiter='\t', fmt='%.6f')
+        temp.append(data)
+
+
 def generate_train_test_files(descriptor_dir, models_in_train=10):
     models_dir = os.path.join(DATA_DIR, descriptor_dir)
     with open(os.path.join(models_dir, 'models.csv'), 'rb') as csvfile, \
